@@ -28,7 +28,7 @@ const useStyles = makeStyles({
         minWidth: 250,
     },
     row: {
-        width: 'calc(100% - 17px)',
+        width: 'calc(100% - 12px)',
         height: 15
     },
     header__cell: {
@@ -47,39 +47,15 @@ const useStyles = makeStyles({
     },
     tableBody: {
         maxHeight: "100px",
+    },
+    progress: {
+        position: 'absolute',
+        top: -6,
+        right: 0,
+        height: 23,
+        background: 'rgba(0, 200, 0, 0.15)'
     }
 });
-
-function createData(amount, price, total) {
-    return {amount, price, total};
-}
-
-const rows = [
-    createData(159, 6.0, 24),
-    createData(159, 6.0, 24),
-    createData(159, 6.0, 24),
-    createData(159, 6.0, 24),
-    createData(159, 6.0, 24),
-    createData(159, 6.0, 24),
-    createData(159, 6.0, 24),
-    createData(159, 6.0, 24),
-    createData(159, 6.0, 24),
-    createData(159, 6.0, 24),
-    createData(159, 6.0, 24),
-    createData(159, 6.0, 24),
-    createData(159, 6.0, 24),
-    createData(159, 6.0, 24),
-    createData(159, 6.0, 24),
-    createData(159, 6.0, 24),
-    createData(159, 6.0, 24),
-    createData(159, 6.0, 24),
-    createData(159, 6.0, 24),
-    createData(159, 6.0, 24),
-    createData(159, 6.0, 24),
-    createData(159, 6.0, 24),
-    createData(159, 6.0, 24),
-    createData(159, 6.0, 24),
-];
 
 function useWindowSize(elem) {
     const isClient = typeof window === 'object';
@@ -108,27 +84,30 @@ function useWindowSize(elem) {
     return isOverflow;
 }
 
-export default function TradeTable() {
+export default function TradeTable({data}) {
+    const [maxWidth, setMaxWidth] = useState(0);
     const styleProps = {padding: 0};
     const table = useRef();
 
     const overflow = useWindowSize(table);
     if (overflow)
-        styleProps.padding = 17;
+        styleProps.padding = 12;
 
-    useEffect(()=> {
+    useEffect(() => {
         const {current} = table;
-        if(current.scrollHeight > current.offsetHeight){
-            styleProps.padding = 17;
-            current.style.paddingRight = '17px';
-            function setPadding(){
+        setMaxWidth(current.offsetWidth);
+        if (current.scrollHeight > current.offsetHeight) {
+            styleProps.padding = 12;
+            current.style.paddingRight = '12px';
+
+            function setPadding() {
                 current.style.paddingRight = '0';
                 styleProps.padding = 0;
             }
 
-            function unsetPadding(){
-                current.style.paddingRight = '17px';
-                styleProps.padding = 17;
+            function unsetPadding() {
+                current.style.paddingRight = '12px';
+                styleProps.padding = 12;
             }
 
             current.addEventListener("mouseover", setPadding);
@@ -159,13 +138,22 @@ export default function TradeTable() {
             <div className={classes.body} id={'table'} ref={table}>
                 <Table className={classes.table} style={{tableLayout: 'fixed'}}>
                     <TableBody className={classes.tableBody}>
-                        {rows.map((row, i) => (
-                            <TableRow className={classes.row} key={i}>
-                                <TableCell align="left" className={classes.cell}>{row.amount}</TableCell>
-                                <TableCell align="right" className={classes.cell}>{row.price}</TableCell>
-                                <TableCell align="right" className={classes.cell}>{row.total}</TableCell>
-                            </TableRow>
-                        ))}
+                        {data && [...data.entries()].map((row, i) => {
+                            let width = row[1] < 2 ? `${Math.floor(row[1] * maxWidth/2)}px` : `${maxWidth}px`;
+                                return (
+                                    <TableRow className={classes.row} key={i}>
+                                        <TableCell align="left" className={classes.cell}>{row[1].toFixed(6)}</TableCell>
+                                        <TableCell align="right" className={classes.cell}>{row[0].toFixed(6)}</TableCell>
+                                        <TableCell align="right" className={classes.cell}>
+                                            <div style={{position: 'relative'}}>
+                                                {(row[1] * row[0]).toFixed(6)}
+                                                <span className={classes.progress} style={{width: width}}></span>
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                )
+                            }
+                        )}
                     </TableBody>
                 </Table>
             </div>

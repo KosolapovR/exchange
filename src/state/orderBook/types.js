@@ -1,0 +1,4 @@
+const WS_CONNECTED = 'orderBook/WS_CONNECTED';
+const FETCH_ORDER_BOOK = 'orderBook/FETCH_ORDER_BOOK';
+
+export {WS_CONNECTED, FETCH_ORDER_BOOK};
