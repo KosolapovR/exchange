@@ -9,6 +9,8 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import Row from "./Row";
 import Hidden from "@material-ui/core/Hidden";
+import CircularProgress from "@material-ui/core/CircularProgress";
+import Grid from "@material-ui/core/Grid";
 
 const useStyles = makeStyles({
     container: {
@@ -52,6 +54,9 @@ const useStyles = makeStyles({
     tableBody: {
         maxHeight: "100px",
     },
+    loaderContainer: {
+        height: 'calc(100vh - 300px)',
+    }
 });
 
 
@@ -106,7 +111,19 @@ export default function TradeTable(props) {
             <div className={classes.body} id={'table'} ref={table}>
                 <Table className={classes.table} style={{tableLayout: 'fixed'}}>
                     <TableBody className={classes.tableBody}>
-                        {rows}
+                        {
+                            (data && data.size) ?
+                                rows :
+                                <Grid
+                                    className={classes.loaderContainer}
+                                    container
+                                    justify='center'
+                                    alignContent='center'>
+                                    <Grid item>
+                                        <CircularProgress/>
+                                    </Grid>
+                                </Grid>
+                        }
                     </TableBody>
                 </Table>
             </div>
