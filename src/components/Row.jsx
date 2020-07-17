@@ -29,11 +29,12 @@ const useStyles = makeStyles({
     }
 });
 
-const Row = memo(function Row(props){
+const Row = memo(function Row(props) {
     const {data, maxWidth, type, pricePrecision, totalPrecision, limitAmount} = props;
 
     const styleProps = {};
 
+    //позиционирование progress-bar
     if (type === 'bids') {
         styleProps.background = 'rgba(0, 200, 0, 0.15)';
         styleProps.right = 0;
@@ -46,6 +47,7 @@ const Row = memo(function Row(props){
 
     const classes = useStyles(styleProps);
 
+    //ширина progress-bar в зависимости от входящего amount
     let width = data[1] < limitAmount ? `${Math.floor(data[1] * maxWidth / limitAmount)}px` : `${maxWidth}px`;
 
     return (
@@ -56,15 +58,24 @@ const Row = memo(function Row(props){
                     <span className={classes.progress} style={{width: width}}></span>
                 </div> : data[1].toFixed(6)}
             </TableCell>
-            <TableCell align="center" className={classes.cell}>{data[0].toFixed(pricePrecision)}</TableCell>
+            <Hidden smUp>
+                <TableCell align="center" className={classes.cell}>
+                    {type === 'bids' ? <div style={{position: 'relative'}}>
+                        {data[0].toFixed(totalPrecision)}
+                        <span className={classes.progress} style={{width: width}}></span>
+                    </div> : data[0].toFixed(totalPrecision)
+                    }
+                </TableCell>
+            </Hidden>
             <Hidden xsDown>
+                <TableCell align="center" className={classes.cell}>{data[0].toFixed(pricePrecision)}</TableCell>
                 <TableCell align="right" className={classes.cell}>
-                {type === 'bids' ? <div style={{position: 'relative'}}>
-                    {(data[1] * data[0]).toFixed(totalPrecision)}
-                    <span className={classes.progress} style={{width: width}}></span>
-                </div> : (data[1] * data[0]).toFixed(totalPrecision)
-                }
-            </TableCell>
+                    {type === 'bids' ? <div style={{position: 'relative'}}>
+                        {(data[1] * data[0]).toFixed(totalPrecision)}
+                        <span className={classes.progress} style={{width: width}}></span>
+                    </div> : (data[1] * data[0]).toFixed(totalPrecision)
+                    }
+                </TableCell>
             </Hidden>
         </TableRow>
     )
